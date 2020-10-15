@@ -1,4 +1,4 @@
-# template-autoops-cronjob
+# template-autoops-statefulset
 
 ## Usage
 
@@ -9,14 +9,14 @@ Create namespace `autoops` and apply yaml resources as described below.
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: template-autoops-cronjob
+  name: template-autoops-statefulset
   namespace: autoops
 ---
 # create clusterrole
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
-  name: template-autoops-cronjob
+  name: template-autoops-statefulset
 rules:
   - apiGroups: [""]
     resources: ["pods"]
@@ -26,33 +26,52 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
-  name: template-autoops-cronjob
+  name: template-autoops-statefulset
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: template-autoops-cronjob
+  name: template-autoops-statefulset
 subjects:
   - kind: ServiceAccount
-    name: template-autoops-cronjob
+    name: template-autoops-statefulset
     namespace: autoops
 ---
-# create cronjob
-apiVersion: batch/v1beta1
-kind: CronJob
+# create service
+apiVersion: v1
+kind: Service
 metadata:
-  name: template-autoops-cronjob
+  name: template-autoops-statefulset
   namespace: autoops
 spec:
-  schedule: "*/5 * * * *"
-  jobTemplate:
+  ports:
+    - port: 42
+      name: answer
+  clusterIP: None
+  selector:
+    app: template-autoops-statefulset
+---
+# create statefulset
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: template-autoops-statefulset
+  namespace: autoops
+spec:
+  selector:
+    matchLabels:
+      k8s-app: template-autoops-statefulset
+  serviceName: template-autoops-statefulset
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        k8s-app: template-autoops-statefulset
     spec:
-      template:
-        spec:
-          serviceAccount: template-autoops-cronjob
-          containers:
-            - name: template-autoops-cronjob
-              image: autoops/template-autoops-cronjob
-          restartPolicy: OnFailure
+      serviceAccount: template-autoops-statefulset
+      containers:
+        - name: template-autoops-statefulset
+          image: autoops/template-autoops-statefulset
+          imagePullPolicy: Always
 ```
 
 ## Credits

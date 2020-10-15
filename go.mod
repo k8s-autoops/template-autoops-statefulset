@@ -1,4 +1,4 @@
-module github.com/k8s-autoops/template-autoops-cronjob
+module github.com/k8s-autoops/template-autoops-statefulset
 
 go 1.14
 

@@ -8,6 +8,8 @@ import (
 	"k8s.io/client-go/rest"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 func exit(err *error) {
@@ -41,4 +43,8 @@ func main() {
 	}
 
 	log.Println("Total Pods:", len(pods.Items))
+
+	chSig := make(chan os.Signal, 1)
+	signal.Notify(chSig, syscall.SIGTERM, syscall.SIGINT)
+	<-chSig
 }
