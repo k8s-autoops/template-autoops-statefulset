@@ -48,7 +48,7 @@ spec:
       name: answer
   clusterIP: None
   selector:
-    app: template-autoops-statefulset
+    k8s-app: template-autoops-statefulset
 ---
 # create statefulset
 apiVersion: apps/v1
